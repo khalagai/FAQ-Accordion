@@ -1,95 +1,45 @@
-// ORIGINAL SOLUTION WHICH WORKS BUT NOT DYNAMIC!!//
-
-// const first = document.getElementById("answer0");
-// const second = document.getElementById("answer1");
-// const third = document.getElementById("answer2");
-// const fourth = document.getElementById("answer3");
-// const myImg = document.getElementById("img0")
-// const myImg1 = document.getElementById("img1")
-// const myImg2 = document.getElementById("img2")
-// const myImg3 = document.getElementById("img3")
-
-// const showUs0 = () => {
-//     if (first.style.display === "none") {
-//         first.style.display = "block";
-//         myImg.src = "./assets/images/icon-minus.svg";
-//     } else {
-//         first.style.display = "none";
-//         myImg.src = "./assets/images/icon-plus.svg";
-//     }
-// }
-// const showUs1 = () => {
-//     if (second.style.display === "none") {
-//         second.style.display = "block";
-//         myImg1.src = "./assets/images/icon-minus.svg";
-//     } else {
-//         second.style.display = "none";
-//         myImg1.src = "./assets/images/icon-plus.svg";
-//     }
-// }
-// const showUs2 = () => {
-//     if (third.style.display === "none") {
-//         third.style.display = "block";
-//         myImg2.src = "./assets/images/icon-minus.svg";
-//     } else {
-//         third.style.display = "none";
-//         myImg2.src = "./assets/images/icon-plus.svg";
-//     }
-// }
-// const showUs3 = () => {
-//     if (fourth.style.display === "none") {
-//         fourth.style.display = "block";
-//         myImg3.src = "./assets/images/icon-minus.svg";
-//     } else {
-//         fourth.style.display = "none";
-//         myImg3.src = "./assets/images/icon-plus.svg";
-//     }
-// }
-
-
-
 document.addEventListener("DOMContentLoaded", () => {
-    let questions = document.querySelectorAll(".request");
+    const questions = document.querySelectorAll(".request");
 
     questions.forEach((question, index) => {
-        question.addEventListener("click", () => {
-            showAnswer(index);  
-        });      
-  
-        question.addEventListener("keypress", (event) => {
-            if(event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                showAnswer(index);
-            }        
-        });
+        question.setAttribute("role", "button");
+        question.setAttribute("aria-expanded", "false");
+        question.setAttribute("tabindex", "0"); // Ensures it's focusable
 
-        question.addEventListener("keydown", (event) => {
-            if (event.key === "ArrowUp") {
-                navigateTo(index - 1);
-            } else if (event.key === "ArrowDown") {
-                navigateTo(index + 1);
-            }
-        })
+        question.addEventListener("click", () => toggleAnswer(index));
+        question.addEventListener("keypress", (event) => handleKeyPress(event, index));
+        question.addEventListener("keydown", (event) => handleNavigation(event, index));
     });
-  
-  const showAnswer = (index) => {
-    let answer = document.getElementById("answer"+index);
-    let image = document.getElementById("img"+index);
 
-    if (answer.style.display === "none") {
-        answer.style.display = "block";
-        image.src = "./assets/images/icon-minus.svg"; // Change to minus icon
-      } else {
-        answer.style.display = "none";
-        image.src = "./assets/images/icon-plus.svg"; // Change to plus icon
-      }
+    const toggleAnswer = (index) => {
+        const question = questions[index];
+        const answer = document.getElementById(`answer${index}`);
+        const image = document.getElementById(`img${index}`);
+        const isExpanded = question.getAttribute("aria-expanded") === "true";
 
-  }
+        question.setAttribute("aria-expanded", !isExpanded);
+        answer.style.display = isExpanded ? "none" : "block";
+        image.src = isExpanded ? "./assets/images/icon-plus.svg" : "./assets/images/icon-minus.svg";
+    };
 
-  const navigateTo = (index) => {
-    if (index >= 0 && index < questions.length) {
-        questions[index].focus();
-    }
-  }
-  
+    const handleKeyPress = (event, index) => {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            toggleAnswer(index);
+        }
+    };
+
+    const handleNavigation = (event, index) => {
+        if (event.key === "ArrowUp") {
+            navigateTo(index - 1);
+        } else if (event.key === "ArrowDown") {
+            navigateTo(index + 1);
+        }
+    };
+
+    const navigateTo = (index) => {
+        if (index >= 0 && index < questions.length) {
+            questions[index].focus();
+        }
+    };
 });
